@@ -430,6 +430,9 @@
   }
 
   function exportButton(getSorted) {
+    if (!DATA_DOWNLOAD_ENABLED) {
+      return el('button', { class: 'btn', disabled: true, title: 'Exportação de dados temporariamente indisponível' }, 'Baixar dados');
+    }
     return dropdownContainer('export', 'Baixar dados ▾', 'btn', (menu) => {
       menu.style.width = '300px'; menu.style.right = '0';
 

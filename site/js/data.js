@@ -184,6 +184,11 @@ function downloadCSV(filename, headers, rows) {
 --------------------------------------------------------------------- */
 const ChartExports = {};
 
+/* Chave unica pra ligar/desligar a exportacao de dados (CSV) no site
+   inteiro - grafico por grafico, o explorador de dados e o dicionario.
+   O download de imagem (PNG) dos graficos nao e' afetado. */
+const DATA_DOWNLOAD_ENABLED = false;
+
 function registerChartExport(canvasId, chart, csv) {
   ChartExports[canvasId] = { chart, csv };
 }
@@ -281,10 +286,14 @@ function chartToolbar(canvasId) {
       class: 'chart-tool-btn', type: 'button', title: 'Baixar imagem em alta resolução (com marca PPMAC)',
       onclick: () => downloadChartImage(canvasId),
     }, [el('span', { html: DOWNLOAD_ICON }), 'Imagem']),
-    el('button', {
-      class: 'chart-tool-btn', type: 'button', title: 'Baixar os dados que geraram este gráfico (CSV)',
-      onclick: () => downloadChartCSV(canvasId),
-    }, [el('span', { html: DOWNLOAD_ICON }), 'Dados']),
+    DATA_DOWNLOAD_ENABLED
+      ? el('button', {
+          class: 'chart-tool-btn', type: 'button', title: 'Baixar os dados que geraram este gráfico (CSV)',
+          onclick: () => downloadChartCSV(canvasId),
+        }, [el('span', { html: DOWNLOAD_ICON }), 'Dados'])
+      : el('button', {
+          class: 'chart-tool-btn', type: 'button', disabled: true, title: 'Exportação de dados temporariamente indisponível',
+        }, [el('span', { html: DOWNLOAD_ICON }), 'Dados']),
   ]);
 }
 

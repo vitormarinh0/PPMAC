@@ -209,6 +209,8 @@ h1 .accent { color: var(--brand); }
 }
 .chart-tool-btn:hover { color: var(--text-primary); border-color: var(--text-muted); }
 .chart-tool-btn svg { width: 10px; height: 10px; flex-shrink: 0; }
+.chart-tool-btn:disabled { opacity: .45; cursor: not-allowed; }
+.chart-tool-btn:disabled:hover { color: var(--text-muted); border-color: var(--border); }
 
 /* seletor de tipo de grafico (construtor de indicadores) - so' mostra as
    opcoes validas pro tipo de dado escolhido */
@@ -247,6 +249,7 @@ select:focus, input:focus { outline: 2px solid var(--series-1); outline-offset: 
 .btn:hover { filter: brightness(1.08); }
 .btn.secondary { background: transparent; color: var(--text-primary); border: 1px solid var(--border); }
 .btn.small { padding: 5px 10px; font-size: 12.5px; }
+.btn:disabled { background: var(--gridline); color: var(--text-muted); cursor: not-allowed; filter: none; }
 .pill {
   display: inline-flex; align-items: center; gap: 6px;
   background: var(--gridline); color: var(--text-primary);

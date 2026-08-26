@@ -85,10 +85,14 @@
     const filtered = catalog.filter(matches);
     const countRow = el('div', { style: 'display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px' }, [
       el('p', { class: 'result-count', style: 'margin:0' }, `${fmtNum(filtered.length)} de ${fmtNum(catalog.length)} variáveis`),
-      el('button', {
-        class: 'btn secondary small', type: 'button',
-        onclick: () => downloadDictionaryCSV(filtered, state.q || state.section || state.type ? 'dicionario-filtrado.csv' : 'dicionario-ppmac.csv'),
-      }, `Baixar ${filtered.length === catalog.length ? 'dicionário completo' : 'esta seleção'} (CSV)`),
+      DATA_DOWNLOAD_ENABLED
+        ? el('button', {
+            class: 'btn secondary small', type: 'button',
+            onclick: () => downloadDictionaryCSV(filtered, state.q || state.section || state.type ? 'dicionario-filtrado.csv' : 'dicionario-ppmac.csv'),
+          }, `Baixar ${filtered.length === catalog.length ? 'dicionário completo' : 'esta seleção'} (CSV)`)
+        : el('button', {
+            class: 'btn secondary small', type: 'button', disabled: true, title: 'Exportação de dados temporariamente indisponível',
+          }, 'Baixar dicionário (CSV)'),
     ]);
     results.appendChild(countRow);
 
