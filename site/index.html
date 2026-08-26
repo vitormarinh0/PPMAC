@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel PPMAC — Pesquisa em Assentamentos</title>
+<link rel="icon" type="image/png" href="img/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/vendor/chart.umd.min.js"></script>
+<script src="js/vendor/chartjs-chart-treemap.min.js"></script>
+<script src="js/vendor/chartjs-chart-boxplot.umd.min.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <img class="logo-light" src="img/logo-color.png" alt="PPMAC — Políticas Públicas de Mitigação e Adaptação Climática">
+    <img class="logo-dark" src="img/logo-white.png" alt="PPMAC — Políticas Públicas de Mitigação e Adaptação Climática">
+  </a>
+  <nav>
+    <a href="index.html" class="active">Painel geral</a>
+    <a href="explorar.html">Explorar dados</a>
+    <a href="indicadores.html">Construtor de indicadores</a>
+    <a href="dicionario.html">Dicionário</a>
+    <a href="sobre.html">Sobre / metodologia</a>
+  </nav>
+</div>
+
+<div class="wrap wide">
+  <h1>Famílias em assentamentos rurais: renda, clima e <span class="accent">bioeconomia</span></h1>
+  <p class="subtitle">Painel interativo com os dados da pesquisa de campo realizada em assentamentos da região de
+  Marabá (PA). Explore indicadores agregados abaixo, ou use o <a href="explorar.html">explorador de dados</a> e o
+  <a href="indicadores.html">construtor de indicadores</a> para investigar qualquer variável do questionário.</p>
+  <a class="btn" href="sobre.html" style="margin-bottom:28px">Saiba mais sobre a metodologia</a>
+
+  <div id="content" class="loading">Carregando dados…</div>
+</div>
+
+<footer>Dados anonimizados para publicação — nomes, coordenadas exatas e identificadores de dispositivo/entrevistador foram removidos. Ver <a href="sobre.html">metodologia</a>.</footer>
+
+<script src="js/data.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Explorar dados — Painel PPMAC</title>
+<link rel="icon" type="image/png" href="img/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <img class="logo-light" src="img/logo-color.png" alt="PPMAC — Políticas Públicas de Mitigação e Adaptação Climática">
+    <img class="logo-dark" src="img/logo-white.png" alt="PPMAC — Políticas Públicas de Mitigação e Adaptação Climática">
+  </a>
+  <nav>
+    <a href="index.html">Painel geral</a>
+    <a href="explorar.html" class="active">Explorar dados</a>
+    <a href="indicadores.html">Construtor de indicadores</a>
+    <a href="dicionario.html">Dicionário</a>
+    <a href="sobre.html">Sobre / metodologia</a>
+  </nav>
+</div>
+
+<div class="wrap wide">
+  <h1>Explorar dados</h1>
+  <p class="subtitle">Filtre e navegue pelas respostas anonimizadas, registro a registro. Cada linha representa um
+  domicílio entrevistado (identificado apenas por um código sintético — sem nome, sem coordenadas exatas).</p>
+
+  <div id="content" class="loading">Carregando dados…</div>
+</div>
+
+<footer>Dados anonimizados para publicação. Ver <a href="sobre.html">metodologia</a>.</footer>
+
+<script src="js/data.js"></script>
+<script src="js/explorer.js"></script>
+</body>
+</html>

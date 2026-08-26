@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Construtor de indicadores — Painel PPMAC</title>
+<link rel="icon" type="image/png" href="img/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/vendor/chart.umd.min.js"></script>
+<script src="js/vendor/chartjs-chart-treemap.min.js"></script>
+<script src="js/vendor/chartjs-chart-boxplot.umd.min.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <img class="logo-light" src="img/logo-color.png" alt="PPMAC — Políticas Públicas de Mitigação e Adaptação Climática">
+    <img class="logo-dark" src="img/logo-white.png" alt="PPMAC — Políticas Públicas de Mitigação e Adaptação Climática">
+  </a>
+  <nav>
+    <a href="index.html">Painel geral</a>
+    <a href="explorar.html">Explorar dados</a>
+    <a href="indicadores.html" class="active">Construtor de indicadores</a>
+    <a href="dicionario.html">Dicionário</a>
+    <a href="sobre.html">Sobre / metodologia</a>
+  </nav>
+</div>
+
+<div class="wrap wide">
+  <h1>Construtor de indicadores</h1>
+  <p class="subtitle">Escolha qualquer pergunta do questionário e cruze com um recorte (município, assentamento,
+  sexo, faixa etária...) para gerar um gráfico e uma tabela na hora. Os filtros rápidos do
+  <a href="explorar.html">explorador de dados</a> não se aplicam aqui — este indicador sempre usa a base completa.</p>
+
+  <div id="content" class="loading">Carregando dados…</div>
+</div>
+
+<footer>Dados anonimizados para publicação. Ver <a href="sobre.html">metodologia</a>.</footer>
+
+<script src="js/data.js"></script>
+<script src="js/indicators.js"></script>
+</body>
+</html>

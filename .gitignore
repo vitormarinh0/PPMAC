@@ -1,0 +1,9 @@
+# SO / editor
+.DS_Store
+.Rhistory
+.Rproj.user/
+
+# base bruta com identificadores diretos (nome, data de nascimento, GPS
+# exato, telefone, device id) - NAO publicar, nem em repositorio privado.
+# Ver README.md. O que o site consome (ja anonimizado) fica em site/data/.
+data/questionarios_clean.rds
