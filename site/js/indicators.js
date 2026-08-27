@@ -84,6 +84,7 @@
     if (!hasGroup) {
       return [
         { id: 'donut', label: 'Rosca', hint: 'Boa para poucas categorias — mostra a proporção do total.' },
+        { id: 'polar', label: 'Setores (polar)', hint: 'Estilo mais ilustrativo: cada categoria "cresce" do centro pra fora. Funciona melhor com 3–6 categorias de tamanho parecido — categorias muito pequenas ficam sem rótulo escrito.' },
         { id: 'ranking', label: 'Ranking (barras)', hint: 'Melhor quando há muitas categorias para comparar.' },
       ];
     }
@@ -206,6 +207,8 @@
         if (state.chartType === 'ranking') {
           const items = labels.map(l => ({ label: l, count: counts[l] }));
           currentChart = lollipopChart('indChart', items, dv, { total });
+        } else if (state.chartType === 'polar') {
+          currentChart = polarAreaChart('indChart', displayRows, meta.id, dv, { fieldLabel: 'Categoria' });
         } else {
           currentChart = donutChart('indChart', displayRows, meta.id, dv, { fieldLabel: 'Categoria' });
         }

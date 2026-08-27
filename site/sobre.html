@@ -55,48 +55,12 @@
   </div>
 
   <div class="card" style="margin-bottom:16px">
-    <h2>Indicadores compostos</h2>
-    <ul style="padding-left:20px; color:var(--text-secondary); font-size:14px">
-      <li><strong>ILDI</strong> — diversificação de renda e meios de vida.</li>
-      <li><strong>CVPS</strong> — percepção de vulnerabilidade climática.</li>
-      <li><strong>BEI</strong> — engajamento com a bioeconomia.</li>
-      <li><strong>RACI</strong> — capacidade adaptativa reportada.</li>
-    </ul>
-    <p class="chart-note">Desfechos primários. Desfechos secundários: <strong>ASDI</strong> (diversidade de
-    estratégias de adaptação) e <strong>MCET</strong> (tipologia de engajamento climático municipal, qualitativa).
-    Reconstituíveis no <a href="indicadores.html">construtor de indicadores</a> a partir das variáveis que
-    compõem cada índice.</p>
-  </div>
-
-  <div class="card" style="margin-bottom:16px">
-    <h2>Análise</h2>
-    <p>Dados quantitativos: modelos lineares e lineares generalizados mistos (LMM/GLMM), com assentamento e
-    município como níveis aninhados. Dados qualitativos: análise temática reflexiva. Integração por quadro de
-    triangulação (convergência, complementaridade, divergência). Dados ausentes: FIML e imputação múltipla no
-    protocolo; neste painel, exclusão listwise por gráfico/indicador — "Base: N domicílios" reflete apenas
-    respostas válidas.</p>
-  </div>
-
-  <div class="card" style="margin-bottom:16px">
     <h2>Anonimização</h2>
     <p>A base publicada não é a base bruta de coleta. Foram removidos permanentemente: identificação direta (nome,
     data de nascimento exata, local de nascimento), geolocalização exata (GPS, altitude), identificadores de coleta
     (dispositivo, telefone e usuário do(a) entrevistador(a), instanceID/KEY/caseID, timestamps exatos) e demais
     campos de texto livre. Cada domicílio recebe um código sintético (ex.: <code>R001</code>) sem relação com a
     ordem ou identidade da coleta original.</p>
-  </div>
-
-  <div class="notice">
-    <strong>Normalização de topônimos.</strong> Município e assentamento foram digitados livremente em campo
-    (variação de grafia, acentuação, abreviação); os valores foram normalizados para um nome canônico por
-    correspondência textual, com casos ambíguos mantidos como categorias separadas. Tabela de correspondência
-    completa em <code>data/derived/crosswalk_localidades.csv</code>.
-  </div>
-
-  <div class="card" style="margin-bottom:16px">
-    <h2>Contato</h2>
-    <p>Dúvidas sobre a metodologia, a base de dados ou solicitações de acesso a dados adicionais devem ser
-    direcionadas à equipe de pesquisa responsável pelo projeto.</p>
   </div>
 
   <div class="card" id="referencia">
@@ -108,7 +72,13 @@
   </div>
 </div>
 
-<footer>Dados anonimizados para publicação.</footer>
+<footer style="display: flex; justify-content: center; align-items: center; padding: 20px;">
+  <img
+    src="img/logo-color.png"
+    alt="Logo do Observatório"
+    style="width: 150px; height: auto;"
+  >
+</footer>
 
 </body>
 </html>

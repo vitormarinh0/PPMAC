@@ -350,6 +350,84 @@ function referenceLinePlugin(value, label, dv, orientation) {
   };
 }
 
+/* Desenha o valor de cada barra sobre a propria barra - por dentro (branco,
+   com contorno escuro) quando ha' espaco, ou logo acima/ao lado (na cor do
+   texto normal) quando a barra e' curta demais pro rotulo caber dentro.
+   Em graficos com mais de uma serie (empilhado/agrupado), barras curtas
+   demais simplesmente ficam sem rotulo em vez de arriscar sobrepor a serie
+   vizinha - a legenda e o tooltip continuam cobrindo esse caso. */
+/* Lê a cor de fundo da barra (hex, com ou sem canal alfa de 2 digitos) e
+   devolve a luminancia percebida - compondo sobre a cor do cartao quando
+   ha' transparencia (ex: a barra "Não" cinza semi-transparente), pra nao
+   julgar clara/escura pela cor crua e sim pelo que realmente aparece na
+   tela em cada tema. */
+function barBackgroundLuminance(hex, surfaceHex) {
+  if (typeof hex !== 'string' || hex[0] !== '#' || hex.length < 7) return 0;
+  const clean = hex.slice(1);
+  let r = parseInt(clean.slice(0, 2), 16), g = parseInt(clean.slice(2, 4), 16), b = parseInt(clean.slice(4, 6), 16);
+  const a = clean.length >= 8 ? parseInt(clean.slice(6, 8), 16) / 255 : 1;
+  if (a < 1 && typeof surfaceHex === 'string' && surfaceHex[0] === '#') {
+    const sc = surfaceHex.slice(1);
+    const sr = parseInt(sc.slice(0, 2), 16), sg = parseInt(sc.slice(2, 4), 16), sb = parseInt(sc.slice(4, 6), 16);
+    r = r * a + sr * (1 - a); g = g * a + sg * (1 - a); b = b * a + sb * (1 - a);
+  }
+  if (isNaN(r) || isNaN(g) || isNaN(b)) return 0;
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+}
+
+function barValueLabelsPlugin(dv, formatValue) {
+  return {
+    id: 'barValueLabels',
+    afterDatasetsDraw(chart) {
+      const horizontal = chart.options.indexAxis === 'y';
+      const multiSeries = chart.data.datasets.length > 1;
+      const { ctx } = chart;
+      chart.data.datasets.forEach((ds, di) => {
+        const meta = chart.getDatasetMeta(di);
+        if (meta.hidden) return;
+        meta.data.forEach((bar, i) => {
+          const value = ds.data[i];
+          if (value === null || value === undefined || !value) return;
+          const label = formatValue(value, di, i);
+          if (!label) return;
+          const { x, y, base } = bar.getProps(['x', 'y', 'base'], true);
+          const size = horizontal ? Math.abs(x - base) : Math.abs(y - base);
+          const inside = size > 26;
+          if (!inside && multiSeries) return;
+          ctx.save();
+          ctx.font = `700 11px ${dv.font}`;
+          if (inside) {
+            ctx.textAlign = horizontal ? 'right' : 'center';
+            ctx.textBaseline = horizontal ? 'middle' : 'top';
+            // fundo claro (ex: barra "Não" em cinza) pede texto escuro em vez
+            // de branco - senao o rotulo some contra a propria barra
+            const bg = Array.isArray(ds.backgroundColor) ? ds.backgroundColor[i] : ds.backgroundColor;
+            const onLight = barBackgroundLuminance(bg, dv.surface) > 0.6;
+            // aqui o contraste e' contra a COR DA BARRA, nao contra o fundo da
+            // pagina - "dv.text" seria branco no tema escuro (certo pra ler no
+            // fundo escuro, errado sobre uma barra clara), entao usa preto fixo
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = onLight ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.35)';
+            ctx.fillStyle = onLight ? '#111' : '#fff';
+            const px = horizontal ? x - 6 : x;
+            const py = horizontal ? y : y + 6;
+            ctx.strokeText(label, px, py);
+            ctx.fillText(label, px, py);
+          } else {
+            ctx.textAlign = horizontal ? 'left' : 'center';
+            ctx.textBaseline = horizontal ? 'middle' : 'bottom';
+            ctx.fillStyle = dv.text;
+            const px = horizontal ? x + 5 : x;
+            const py = horizontal ? y : y - 4;
+            ctx.fillText(label, px, py);
+          }
+          ctx.restore();
+        });
+      });
+    }
+  };
+}
+
 function barChart(canvasId, rows, field, dv, opts = {}) {
   const canvas = document.getElementById(canvasId);
   if (!canvas) return;
@@ -382,12 +460,14 @@ function barChart(canvasId, rows, field, dv, opts = {}) {
     options: {
       indexAxis: opts.horizontal ? 'y' : 'x',
       responsive: true, maintainAspectRatio: false,
+      layout: { padding: opts.horizontal ? { right: 36 } : { top: 22 } },
       plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${fmtNum(c.parsed[opts.horizontal ? 'x' : 'y'])} domicílios` } } },
       scales: {
         x: { grid: { color: dv.grid, display: !opts.horizontal }, ticks: { color: dv.muted } },
         y: { grid: { color: dv.grid, display: opts.horizontal }, ticks: { color: dv.muted }, beginAtZero: true }
       }
-    }
+    },
+    plugins: [barValueLabelsPlugin(dv, v => fmtNum(v))]
   });
   registerChartExport(canvasId, chart, {
     filename: slugify(canvasId),
@@ -416,13 +496,15 @@ function barChartFromValues(canvasId, labels, values, dv, opts = {}) {
     options: {
       indexAxis: opts.horizontal ? 'y' : 'x',
       responsive: true, maintainAspectRatio: false,
+      layout: { padding: opts.horizontal ? { right: 44 } : { top: 22 } },
       plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${fmtNum(c.parsed[opts.horizontal ? 'x' : 'y'])}${unit}` } } },
       scales: {
         x: { grid: { color: dv.grid, display: !opts.horizontal }, ticks: { color: dv.muted } },
         y: { grid: { color: dv.grid, display: opts.horizontal }, ticks: { color: dv.muted }, beginAtZero: true,
              title: { display: !!opts.yTitle, text: opts.yTitle, color: dv.secondary } }
       }
-    }
+    },
+    plugins: [barValueLabelsPlugin(dv, v => `${fmtNum(v)}${unit}`)]
   });
   registerChartExport(canvasId, chart, {
     filename: slugify(canvasId),
@@ -450,18 +532,21 @@ function donutChart(canvasId, rows, field, dv, opts = {}) {
       labels,
       datasets: [{
         data, backgroundColor: colors,
-        borderColor: dv.surface, borderWidth: 2, borderRadius: 6, spacing: 3, hoverOffset: 10,
+        borderColor: dv.surface, borderWidth: 2, borderRadius: 8, spacing: 3, hoverOffset: 10,
       }]
     },
     options: {
-      responsive: true, maintainAspectRatio: false, cutout: '68%',
+      responsive: true, maintainAspectRatio: false, cutout: '62%',
       animation: { animateRotate: true, animateScale: true },
       plugins: {
         legend: { position: 'bottom', labels: { color: dv.secondary, boxWidth: 10, padding: 12, font: { size: 11.5 } } },
         tooltip: { callbacks: { label: c => ` ${c.label}: ${fmtNum(c.parsed)} (${pct(c.parsed, total)}%)` } }
       }
     },
-    plugins: [centerTextPlugin(fmtNum(total), opts.centerLabel || 'domicílios')]
+    plugins: [
+      donutValueLabelsPlugin(dv, total),
+      centerTextPlugin(fmtNum(total), opts.centerLabel || 'domicílios'),
+    ]
   });
   registerChartExport(canvasId, chart, {
     filename: slugify(canvasId),
@@ -469,6 +554,135 @@ function donutChart(canvasId, rows, field, dv, opts = {}) {
     rows: labels.map((l, i) => [l, data[i], pct(data[i], total)]),
   });
   return chart;
+}
+
+/* Desenha o % de cada fatia do donut, direto sobre a fatia - poupa o
+   usuario de precisar passar o mouse pra saber o valor. Fatias muito
+   finas (pouco expressivas) ficam sem numero pra nao estourar o
+   espaco disponivel; continuam legiveis pela legenda e pelo tooltip. */
+function donutValueLabelsPlugin(dv, total) {
+  return {
+    id: 'donutValueLabels',
+    afterDatasetsDraw(chart) {
+      const meta = chart.getDatasetMeta(0);
+      const data = chart.data.datasets[0].data;
+      const { ctx } = chart;
+      meta.data.forEach((arc, i) => {
+        if (!data[i] || data[i] / total < 0.05) return;
+        const { x, y, startAngle, endAngle, innerRadius, outerRadius } = arc.getProps(
+          ['x', 'y', 'startAngle', 'endAngle', 'innerRadius', 'outerRadius'], true);
+        const mid = (startAngle + endAngle) / 2;
+        const r = (innerRadius + outerRadius) / 2;
+        const px = x + Math.cos(mid) * r;
+        const py = y + Math.sin(mid) * r;
+        ctx.save();
+        ctx.font = `700 12px ${dv.font}`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+        ctx.fillStyle = '#fff';
+        const label = `${pct(data[i], total)}%`;
+        ctx.strokeText(label, px, py);
+        ctx.fillText(label, px, py);
+        ctx.restore();
+      });
+    }
+  };
+}
+
+/* Grafico polar (setores de angulo igual, raio proporcional ao valor) -
+   variante mais ilustrativa do donut para poucas categorias (ate' uns 6):
+   mesma paleta categorica e o mesmo buraco central com o total, mas cada
+   fatia "cresce" do centro pra fora em vez de variar em angulo. */
+function polarAreaChart(canvasId, rows, field, dv, opts = {}) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const counts = countBy(rows, field);
+  const sortedKeys = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+  const data = sortedKeys.map(l => counts[l]);
+  const labels = opts.maxLen
+    ? sortedKeys.map(l => l.length > opts.maxLen ? l.slice(0, opts.maxLen - 1) + '…' : l)
+    : sortedKeys;
+  const colors = labels.map((_, i) => seriesColor(i));
+  const total = data.reduce((a, b) => a + b, 0);
+
+  const chart = new Chart(canvas, {
+    type: 'polarArea',
+    data: {
+      labels,
+      datasets: [{
+        data, backgroundColor: colors,
+        borderColor: dv.surface, borderWidth: 3, borderRadius: 8, spacing: 2,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '22%',
+      animation: { animateRotate: true, animateScale: true },
+      scales: {
+        r: {
+          grid: { display: false },
+          angleLines: { display: false },
+          pointLabels: { display: false },
+          ticks: { display: false },
+        }
+      },
+      plugins: {
+        legend: { position: 'bottom', labels: { color: dv.secondary, boxWidth: 10, padding: 12, font: { size: 11.5 } } },
+        tooltip: { callbacks: { label: c => ` ${c.label}: ${fmtNum(c.raw)} (${pct(c.raw, total)}%)` } }
+      }
+    },
+    plugins: [
+      polarValueLabelsPlugin(dv, total),
+      centerTextPlugin(fmtNum(total), opts.centerLabel || 'domicílios'),
+    ]
+  });
+  registerChartExport(canvasId, chart, {
+    filename: slugify(canvasId),
+    headers: [opts.fieldLabel || field, 'Domicílios', '%'],
+    rows: labels.map((l, i) => [l, data[i], pct(data[i], total)]),
+  });
+  return chart;
+}
+
+/* Desenha o valor (%) no meio de cada setor do polar area - o raio variavel
+   por si so' e' dificil de ler com precisao, o rotulo direto resolve isso.
+   Setores muito pequenos (perto do buraco central) ficam sem rotulo escrito
+   pra nao empilhar texto ilegivel uns sobre os outros - continuam legiveis
+   pela legenda e pelo tooltip ao passar o mouse. */
+function polarValueLabelsPlugin(dv, total) {
+  return {
+    id: 'polarValueLabels',
+    afterDatasetsDraw(chart) {
+      const meta = chart.getDatasetMeta(0);
+      const data = chart.data.datasets[0].data;
+      const { ctx } = chart;
+      meta.data.forEach((arc, i) => {
+        if (!data[i] || data[i] / total < 0.1) return;
+        const { x, y, startAngle, endAngle, innerRadius, outerRadius } = arc.getProps(
+          ['x', 'y', 'startAngle', 'endAngle', 'innerRadius', 'outerRadius'], true);
+        if (outerRadius - innerRadius < 16) return;
+        const mid = (startAngle + endAngle) / 2;
+        const r = innerRadius + (outerRadius - innerRadius) * 0.68;
+        // muito perto do centro colide com o total (centerTextPlugin) -
+        // melhor deixar sem rotulo escrito do que sobrepor os dois
+        if (r < 58) return;
+        const px = x + Math.cos(mid) * r;
+        const py = y + Math.sin(mid) * r;
+        ctx.save();
+        ctx.font = `700 13px ${dv.font}`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+        ctx.fillStyle = '#fff';
+        const label = `${pct(data[i], total)}%`;
+        ctx.strokeText(label, px, py);
+        ctx.fillText(label, px, py);
+        ctx.restore();
+      });
+    }
+  };
 }
 
 function boxplotByGroup(canvasId, rows, groupField, valueField, dv, opts = {}) {
@@ -487,6 +701,10 @@ function boxplotByGroup(canvasId, rows, groupField, valueField, dv, opts = {}) {
   // cor por identidade do grupo (indice alfabetico estavel em `groups`), nao
   // pela posicao de exibicao - assim cada categoria mantem sempre a mesma cor
   const colors = order.map(i => seriesColor(i));
+  // preenchimento = a propria cor clareada em direcao a cor do cartao (nao
+  // alfa cru) - fica solido e legivel nos dois temas, em vez de "lavado"
+  const fills = colors.map(c => lerpColor(dv.surface, c, 0.22));
+  const itemFills = colors.map(c => lerpColor(dv.surface, c, 0.8));
   const means = order.map(i => byGroup[i].reduce((a, b) => a + b, 0) / (byGroup[i].length || 1));
   const allValues = groups.flatMap((_, i) => byGroup[i]);
   const grandMean = allValues.reduce((a, b) => a + b, 0) / (allValues.length || 1);
@@ -499,14 +717,17 @@ function boxplotByGroup(canvasId, rows, groupField, valueField, dv, opts = {}) {
         {
           label: 'Distribuição',
           data,
-          backgroundColor: colors.map(c => c + '2e'),
+          backgroundColor: fills,
           borderColor: colors,
-          borderWidth: 1.5,
-          outlierColor: dv.muted,
-          itemRadius: 2,
+          borderWidth: 2,
+          outlierColor: colors,
+          itemRadius: 3,
           itemStyle: 'circle',
-          itemBackgroundColor: colors.map(c => c + '80'),
+          itemBackgroundColor: itemFills,
+          itemBorderColor: dv.surface,
+          itemBorderWidth: 1,
           medianColor: colors,
+          medianWidth: 2.5,
         },
         {
           type: 'line',
@@ -514,8 +735,8 @@ function boxplotByGroup(canvasId, rows, groupField, valueField, dv, opts = {}) {
           data: means,
           showLine: false,
           pointStyle: 'rectRot',
-          pointRadius: 6,
-          pointBorderWidth: 1.5,
+          pointRadius: 7,
+          pointBorderWidth: 2,
           pointBackgroundColor: dv.accentRef,
           pointBorderColor: dv.surface,
         }
@@ -525,8 +746,10 @@ function boxplotByGroup(canvasId, rows, groupField, valueField, dv, opts = {}) {
       responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: {
-          display: true, position: 'bottom',
-          labels: { color: dv.secondary, boxWidth: 10, font: { size: 11 }, filter: item => item.text === 'Média do grupo' }
+          display: true, position: 'bottom', labels: {
+            color: dv.secondary, boxWidth: 10, font: { size: 11 }, usePointStyle: true, pointStyle: 'rectRot',
+            filter: item => item.text === 'Média do grupo',
+          }
         },
         tooltip: {
           callbacks: {
@@ -660,7 +883,8 @@ function stackedBarChart(canvasId, groups, series, matrix, colors, dv, opts = {}
         x: { stacked: !opts.grouped, grid: { display: !opts.horizontal, color: dv.grid }, ticks: { color: dv.muted } },
         y: { stacked: !opts.grouped, grid: { display: opts.horizontal, color: dv.grid }, ticks: { color: dv.muted }, beginAtZero: true }
       }
-    }
+    },
+    plugins: [barValueLabelsPlugin(dv, v => `${fmtNum(v)}${opts.percent ? '%' : ''}`)]
   });
   registerChartExport(canvasId, chart, {
     filename: slugify(canvasId),
@@ -701,12 +925,14 @@ function histogramChart(canvasId, values, dv, opts = {}) {
     data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius: 3, categoryPercentage: 1, barPercentage: 0.96 }] },
     options: {
       responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 22 } },
       plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${fmtNum(c.parsed.y)} domicílios` } } },
       scales: {
         x: { grid: { display: false }, ticks: { color: dv.muted, maxRotation: 0, autoSkip: true, font: { size: 10.5 } } },
         y: { grid: { color: dv.grid }, ticks: { color: dv.muted }, beginAtZero: true }
       }
-    }
+    },
+    plugins: [barValueLabelsPlugin(dv, v => fmtNum(v))]
   });
   registerChartExport(canvasId, chart, {
     filename: slugify(canvasId),

@@ -1,3 +1,15 @@
+const KPI_ICONS = {
+  house: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M9.5 19.5V14h5v5.5"/></svg>',
+  mapPin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-7.3 7-12a7 7 0 1 0-14 0c0 4.7 7 12 7 12z"/><circle cx="12" cy="9" r="2.6"/></svg>',
+  land: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5 9 4l6 3.5 6-3.5v13l-6 3.5-6-3.5-6 3.5v-13z"/><path d="M9 4v13"/><path d="M15 7.5v13"/></svg>',
+  users: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.3"/><path d="M5 20c1-4.2 4-6.3 7-6.3s6 2.1 7 6.3"/></svg>',
+  cloud: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18h10.5a3.5 3.5 0 0 0 0-7 5.5 5.5 0 0 0-10.7-1.7A4 4 0 0 0 7 18z"/></svg>',
+  leaf: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 4c.6 8-3.4 14-12 14H5c0-9 5-14 15-14z"/><path d="M5 20c3-4.5 6.5-7.5 11-9.5"/></svg>',
+  trendUp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16l6-6 4 4 6-8"/><path d="M15 6h5v5"/></svg>',
+  star: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.9.8-4.3 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z"/></svg>',
+  shieldOff: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9.5 12.5l5-3.2M14.5 12.5l-5-3.2"/></svg>',
+};
+
 (async function () {
   const { respondents, catalog } = await AppData.load();
   const root = document.getElementById('content');
@@ -7,7 +19,8 @@
   const n = respondents.length;
   const nMunicipios = uniqueValues(respondents, 'municipio').length;
   const nAssentamentos = uniqueValues(respondents, 'assentamento').length;
-  const chefiaFem = pct(respondents.filter(r => r.chefe_mulher === 'Sim').length, n);
+  const nChefiaFem = respondents.filter(r => r.chefe_mulher === 'Sim').length;
+  const chefiaFem = pct(nChefiaFem, n);
   const ouviuClima = countBy(respondents, 'mudanca_climaticas');
   const ouviuClimaSim = pct((ouviuClima['Sim'] || 0), n);
   const ouviuBio = countBy(respondents, 'bioeconomia');
@@ -17,10 +30,10 @@
   const semApoioBio = pct(countBy(respondents, 'recebeu_apoio_bio')['Não'] || 0, n);
 
   const kpis = el('div', { class: 'grid cols-4', style: 'margin-bottom:32px' }, [
-    kpiCard(fmtNum(n), 'Domicílios entrevistados', 'var(--accent-perfil)'),
-    kpiCard(nMunicipios, 'Municípios', 'var(--accent-perfil)'),
-    kpiCard(nAssentamentos, 'Assentamentos', 'var(--accent-perfil)'),
-    kpiCard(chefiaFem + '%', 'Chefia familiar feminina', 'var(--accent-perfil)'),
+    kpiCard(fmtNum(n), 'Domicílios entrevistados', 'var(--accent-perfil)', { icon: KPI_ICONS.house, context: 'base completa da pesquisa' }),
+    kpiCard(nMunicipios, 'Municípios', 'var(--accent-perfil)', { icon: KPI_ICONS.mapPin, context: 'região de Marabá (PA)' }),
+    kpiCard(nAssentamentos, 'Assentamentos', 'var(--accent-perfil)', { icon: KPI_ICONS.land, context: 'de reforma agrária' }),
+    kpiCard(chefiaFem + '%', 'Chefia familiar feminina', 'var(--accent-perfil)', { icon: KPI_ICONS.users, context: `${fmtNum(nChefiaFem)} de ${fmtNum(n)} famílias` }),
   ]);
   root.appendChild(kpis);
 
@@ -44,7 +57,7 @@
   root.appendChild(sectionHeading('Percepção sobre mudanças climáticas',
     'O que as famílias observam, temem e já ouviram falar sobre o clima.', 'var(--accent-clima)'));
   root.appendChild(el('div', { class: 'grid cols-3' }, [
-    kpiCardBox(ouviuClimaSim + '%', 'Já ouviram falar sobre "mudanças climáticas"', 'var(--accent-clima)'),
+    kpiCardBox(ouviuClimaSim + '%', 'Já ouviram falar sobre "mudanças climáticas"', 'var(--accent-clima)', { icon: KPI_ICONS.cloud }),
     chartCard('preocupacaoChart', 'Nível de preocupação (1 = nenhuma, 5 = muito alta)', 250),
     chartCard('ameacaChart', 'Mudanças climáticas ameaçam a produção?', 250),
   ]));
@@ -52,10 +65,10 @@
   root.appendChild(sectionHeading('Bioeconomia',
     'Conhecimento, interesse e obstáculos das famílias com produtos e cadeias da sociobiodiversidade.', 'var(--accent-bio)'));
   root.appendChild(el('div', { class: 'grid cols-4' }, [
-    kpiCard(ouviuBioSim + '%', 'Já ouviram falar sobre "Bioeconomia"', 'var(--accent-bio)'),
-    kpiCard(interesseAmpliar + '%', 'Têm interesse em ampliar produção e renda', 'var(--accent-bio)'),
-    kpiCard(importanciaAlta + '%', 'Consideram os produtos muito importantes p/ renda', 'var(--accent-bio)'),
-    kpiCard(semApoioBio + '%', 'Nunca receberam apoio público ou privado', 'var(--accent-bio)'),
+    kpiCard(ouviuBioSim + '%', 'Já ouviram falar sobre "Bioeconomia"', 'var(--accent-bio)', { icon: KPI_ICONS.leaf }),
+    kpiCard(interesseAmpliar + '%', 'Têm interesse em ampliar produção e renda', 'var(--accent-bio)', { icon: KPI_ICONS.trendUp }),
+    kpiCard(importanciaAlta + '%', 'Consideram os produtos muito importantes p/ renda', 'var(--accent-bio)', { icon: KPI_ICONS.star }),
+    kpiCard(semApoioBio + '%', 'Nunca receberam apoio público ou privado', 'var(--accent-bio)', { icon: KPI_ICONS.shieldOff }),
   ]));
   root.appendChild(el('div', { class: 'grid cols-1', style: 'margin-top:16px' }, [
     chartCard('produtosBioChart', 'Produtos da bioeconomia mais citados pelas famílias', 460,
@@ -111,14 +124,17 @@
 
   // ---- builders --------------------------------------------------------
 
-  function kpiCard(value, label, color) {
-    return el('div', { class: 'card kpi', style: `border-top:3px solid ${color}` }, [
+  function kpiCard(value, label, color, opts = {}) {
+    return el('div', { class: 'card kpi', style: `--kpi-color:${color}` }, [
+      opts.icon ? el('div', { class: 'kpi-icon', html: opts.icon }) : null,
       el('div', { class: 'value' }, value),
       el('div', { class: 'label' }, label),
+      opts.context ? el('div', { class: 'kpi-context' }, opts.context) : null,
     ]);
   }
-  function kpiCardBox(value, label, color) {
-    return el('div', { class: 'card kpi', style: `justify-content:center; border-top:3px solid ${color}` }, [
+  function kpiCardBox(value, label, color, opts = {}) {
+    return el('div', { class: 'card kpi', style: `justify-content:center; --kpi-color:${color}` }, [
+      opts.icon ? el('div', { class: 'kpi-icon', html: opts.icon }) : null,
       el('div', { class: 'value', style: 'font-size:36px' }, value),
       el('div', { class: 'label' }, label),
     ]);
