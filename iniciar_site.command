@@ -1,4 +1,4 @@
-podemo#!/bin/bash
+#!/bin/bash
 # Abre o painel PPMAC localmente. Da' dois cliques neste arquivo no Finder
 # (ou rode "bash iniciar_site.command" no Terminal) sempre que quiser ver
 # o site rodando no seu computador.
