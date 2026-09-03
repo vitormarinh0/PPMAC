@@ -403,3 +403,59 @@ footer { text-align: center; color: var(--text-muted); font-size: 12px; padding:
   align-items: center; justify-content: center; margin-left: 5px; vertical-align: 1px;
 }
 .dict-link:hover { color: var(--brand); border-color: var(--brand); text-decoration: none; }
+
+/* ---------------------------------------------------------------------
+   Mapa dos municipios
+--------------------------------------------------------------------- */
+.map-grid { display: grid; grid-template-columns: 320px 1fr; gap: 20px; align-items: start; }
+@media (max-width: 900px) { .map-grid { grid-template-columns: 1fr; } }
+
+.muni-list { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+.muni-item {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  background: var(--page); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 8px 10px; cursor: pointer; font-family: var(--font); text-align: left;
+}
+.muni-item:hover { border-color: var(--brand); }
+.muni-item.active { border-color: var(--brand-dark); background: color-mix(in srgb, var(--brand-dark) 10%, var(--page)); }
+.muni-item .swatch { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+.muni-item .name { flex: 1; font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.muni-item .count { font-size: 12px; font-weight: 700; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+
+.map-box { position: relative; height: 620px; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+.map-box .leaflet-container { width: 100%; height: 100%; background: var(--page); font-family: var(--font); }
+@media (max-width: 900px) { .map-box { height: 440px; } }
+
+.map-legend {
+  position: absolute; left: 10px; bottom: 10px; z-index: 500;
+  background: color-mix(in srgb, var(--surface-1) 92%, transparent);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 8px 10px; font-size: 11.5px; color: var(--text-secondary);
+  box-shadow: var(--shadow);
+}
+.map-legend .ramp { display: flex; height: 8px; border-radius: 3px; overflow: hidden; margin: 5px 0 3px; width: 140px; }
+.map-legend .ramp span { flex: 1; }
+.map-legend .scale { display: flex; justify-content: space-between; width: 140px; }
+
+.muni-tooltip.leaflet-tooltip {
+  background: var(--surface-1); color: var(--text-primary); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); box-shadow: var(--shadow); font-family: var(--font);
+  padding: 6px 10px; font-size: 12.5px;
+}
+.muni-tooltip.leaflet-tooltip::before { display: none; }
+.muni-tooltip strong { color: var(--heading-color); }
+
+.control-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.control-row label { margin: 0; white-space: nowrap; }
+.control-row select { width: auto; min-width: 220px; }
+.year-control { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 220px; }
+.year-control input[type="range"] { flex: 1; accent-color: var(--brand-dark); }
+.year-control .year-value { font-weight: 700; font-size: 16px; color: var(--heading-color); min-width: 44px; text-align: center; font-variant-numeric: tabular-nums; }
+.year-control button { flex-shrink: 0; }
+
+.muni-detail { margin-top: 18px; }
+.muni-detail-empty { color: var(--text-muted); font-size: 13px; margin-top: 16px; }
+.muni-stat-row { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--gridline); font-size: 13px; }
+.muni-stat-row .k { color: var(--text-secondary); }
+.muni-stat-row .v { color: var(--text-primary); font-weight: 700; font-variant-numeric: tabular-nums; }
+.assent-pill-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }

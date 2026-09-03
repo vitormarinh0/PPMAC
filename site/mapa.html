@@ -3,11 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Explorar dados — Painel PPMAC</title>
+<title>Mapa dos municípios — Painel PPMAC</title>
 <link rel="icon" type="image/png" href="img/favicon-32.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="js/vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -19,9 +20,9 @@
   </a>
   <nav>
     <a href="index.html">Painel geral</a>
-    <a href="mapa.html">Mapa</a>
+    <a href="mapa.html" class="active">Mapa</a>
     <a href="ondas-calor.html">Ondas de calor</a>
-    <a href="explorar.html" class="active">Explorar dados</a>
+    <a href="explorar.html">Explorar dados</a>
     <a href="indicadores.html">Construtor de indicadores</a>
     <a href="dicionario.html">Dicionário</a>
     <a href="sobre.html">Sobre / metodologia</a>
@@ -29,9 +30,10 @@
 </div>
 
 <div class="wrap wide">
-  <h1>Explorar dados</h1>
-  <p class="subtitle">Filtre e navegue pelas respostas anonimizadas, registro a registro. Cada linha representa um
-  domicílio entrevistado (identificado apenas por um código sintético — sem nome, sem coordenadas exatas).</p>
+  <h1>Mapa dos <span class="accent">municípios</span> pesquisados</h1>
+  <p class="subtitle">  Passe o mouse ou clique em um
+ município para ver os principais indicadores da pesquisa de campo — os 7 municípios pesquisados aparecem com borda
+  verde. Alterne a cor do mapa entre número de entrevistas e PIB municipal.</p>
 
   <div id="content" class="loading">Carregando dados…</div>
 </div>
@@ -44,7 +46,9 @@
   >
 </footer>
 
+<script src="js/vendor/leaflet/leaflet.js"></script>
 <script src="js/data.js"></script>
-<script src="js/explorer.js"></script>
+<script src="js/map-common.js"></script>
+<script src="js/map.js"></script>
 </body>
 </html>

@@ -8,8 +8,10 @@
   const ALL_COLUMN_IDS = ['id_pesquisa', ...catalog.map(c => c.id)];
   const PAGE_SIZES = [25, 50, 100];
 
+  const urlMunicipio = new URLSearchParams(location.search).get('municipio') || '';
+
   const state = {
-    quick: { municipio: '', assentamento: '', sexo_entrevistado: '', faixa_etaria: '' },
+    quick: { municipio: urlMunicipio, assentamento: '', sexo_entrevistado: '', faixa_etaria: '' },
     search: '',
     advanced: [],   // {field, kind:'categorical', values:[...]}  |  {field, kind:'numeric', min, max}
     columns: DEFAULT_COLUMNS.slice(),

@@ -3,12 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Explorar dados — Painel PPMAC</title>
+<title>Ondas de calor — Painel PPMAC</title>
 <link rel="icon" type="image/png" href="img/favicon-32.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="js/vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="css/style.css">
+<script src="js/vendor/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -20,8 +22,8 @@
   <nav>
     <a href="index.html">Painel geral</a>
     <a href="mapa.html">Mapa</a>
-    <a href="ondas-calor.html">Ondas de calor</a>
-    <a href="explorar.html" class="active">Explorar dados</a>
+    <a href="ondas-calor.html" class="active">Ondas de calor</a>
+    <a href="explorar.html">Explorar dados</a>
     <a href="indicadores.html">Construtor de indicadores</a>
     <a href="dicionario.html">Dicionário</a>
     <a href="sobre.html">Sobre / metodologia</a>
@@ -29,9 +31,11 @@
 </div>
 
 <div class="wrap wide">
-  <h1>Explorar dados</h1>
-  <p class="subtitle">Filtre e navegue pelas respostas anonimizadas, registro a registro. Cada linha representa um
-  domicílio entrevistado (identificado apenas por um código sintético — sem nome, sem coordenadas exatas).</p>
+  <h1>Ondas de <span class="accent">calor</span> no Pará (1991–2024)</h1>
+  <p class="subtitle">Eventos de onda de calor em cada um dos 144 municípios do Pará, calculados a partir da
+  temperatura do ar diária (reanálise ERA5/ECMWF) por Barrozo, L.V. et al.. Uma onda de calor é definida como um
+  período de dias consecutivos em que a temperatura média diária ultrapassa um percentil histórico (1991–2020)
+  do próprio município. Escolha a métrica, o critério (percentil e duração mínima) e o ano para explorar o mapa.</p>
 
   <div id="content" class="loading">Carregando dados…</div>
 </div>
@@ -44,7 +48,9 @@
   >
 </footer>
 
+<script src="js/vendor/leaflet/leaflet.js"></script>
 <script src="js/data.js"></script>
-<script src="js/explorer.js"></script>
+<script src="js/map-common.js"></script>
+<script src="js/ondas-calor.js"></script>
 </body>
 </html>
